@@ -10,7 +10,7 @@ python main.py -r path/to/assembly/file.txt path/to/tests.txt raw_bool
 ```
 If the `raw_bool` is either `true` or `yes`, all the raw data from the tests will be returned to you. Useful if you have lots of tests and just want averages
 
-###Translator
+### Translator
 ```shell
 python main.py -t path/to/lmc/file.txt
 ```
