@@ -24,7 +24,8 @@ Max cycles      : {max_c}
             whole_file = f.read().splitlines()
             num_tests = len(whole_file)
             for num, d in enumerate(whole_file):
-                print("\r[{:<50}] {:0>5}/{}".format("*" * floor(50 * (num + 1) / num_tests), num + 1, num_tests), end="")
+                print("\r[{:<50}] {:>5}/{:<5} ({:>3}%)".format("*" * floor(50 * (num + 1) / num_tests), num + 1,
+                                                            num_tests, floor(100 * (num + 1) / num_tests)), end="")
                 name, inputs, outputs, max_cycles = d.split(";")
                 inputs = [int(i) for i in inputs.split(",")]
                 outputs = [int(i) for i in outputs.split(",")]
