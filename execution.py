@@ -1,4 +1,4 @@
-import csv
+from math import floor
 
 class Program:
     def __init__(self, text):
@@ -8,7 +8,8 @@ class Program:
         return self.data[item]
 
     def test(self, test_file: str, raw_data: bool = False):
-        out = """\033[4mPass/Fail:\033[0m
+        out = """
+\033[4mPass/Fail:\033[0m
 Passed          : {passed}
 Failed          : {failed}
 
@@ -20,7 +21,10 @@ Max cycles      : {max_c}
         out += "\n\033[4mRaw data:\033[0m\n{raw}" if raw_data else ""
         res = []
         with open(test_file, "r") as f:
-            for d in f.read().splitlines():
+            whole_file = f.read().splitlines()
+            num_tests = len(whole_file)
+            for num, d in enumerate(whole_file):
+                print("\r[{:<50}] {:0>5}/{}".format("*" * floor(50 * (num + 1) / num_tests), num + 1, num_tests), end="")
                 name, inputs, outputs, max_cycles = d.split(";")
                 inputs = [int(i) for i in inputs.split(",")]
                 outputs = [int(i) for i in outputs.split(",")]
@@ -33,7 +37,7 @@ Max cycles      : {max_c}
 
     def single_test(self, given: list, expected: list, test_name: str, max_cycles=50000) -> [int, bool]:
         def error(message):
-            print(f"Test {test_name}\n{message}")
+            print(f"\nTest {test_name}\n{message}")
             return [test_name, cycles, False]
 
         break_conditions = {"BR": lambda: True, "BRP": lambda: acc > 0, "BRZ": lambda: acc == 0}
