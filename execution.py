@@ -1,5 +1,6 @@
 from math import floor
 
+
 class Program:
     def __init__(self, text):
         self.full, self.data, self.pointers = format_prog(text)
@@ -25,7 +26,7 @@ Max cycles      : {max_c}
             num_tests = len(whole_file)
             for num, d in enumerate(whole_file):
                 print("\r[{:<50}] {:>5}/{:<5} ({:>3}%)".format("*" * floor(50 * (num + 1) / num_tests), num + 1,
-                                                            num_tests, floor(100 * (num + 1) / num_tests)), end="")
+                                                               num_tests, floor(100 * (num + 1) / num_tests)), end="")
                 name, inputs, outputs, max_cycles = d.split(";")
                 inputs = [int(i) for i in inputs.split(",")]
                 outputs = [int(i) for i in outputs.split(",")]
@@ -41,11 +42,12 @@ Max cycles      : {max_c}
             print(f"\nTest {test_name}\n{message}")
             return [test_name, cycles, False]
 
-        break_conditions = {"BR": lambda: True, "BRP": lambda: acc > 0, "BRZ": lambda: acc == 0}
+        break_conditions = {"BR": lambda: True, "BRP": lambda: not neg, "BRZ": lambda: acc == 0}
         given.reverse()
         line = 0
         cycles = 0
         acc = 0
+        neg = False
         out = []
         while cycles < max_cycles:
             cmd, ptr = self.full[line]
@@ -69,14 +71,15 @@ Max cycles      : {max_c}
                     line = self.pointers[ptr]
                     cycles += 1
                     continue
-            elif cmd == "ADD":
+            elif cmd in ["ADD", "SUB"]:
                 if ptr not in self.data.keys():
                     return error(f"{ptr} is an unknown register")
-                acc += self.data[ptr]
-            elif cmd == "SUB":
-                if ptr not in self.data.keys():
-                    return error(f"{ptr} is an unknown register")
-                acc -= self.data[ptr]
+                acc += (1 if cmd == "ADD" else -1) * self.data[ptr]
+                if acc < 0:
+                    neg = True
+                else:
+                    neg = False
+                acc %= 1000
             elif cmd == "OUT":
                 out.append(acc)
             elif cmd == "HLT":
