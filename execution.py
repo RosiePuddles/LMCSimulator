@@ -1,4 +1,5 @@
 from math import floor
+import time
 
 
 class Program:
@@ -10,13 +11,16 @@ class Program:
 
     def test(self, test_file: str, raw_data: bool = False):
         out = """
-\033[4mPass/Fail:\033[0m
+\033[4mGeneral:\033[0m
+Mailboxes       : {mail}
+Time per test   : {tpt}ns
 Passed          : {passed}
 Failed          : {failed}
 
 \033[4mPassed tests:\033[0m
 Min cycles      : {min_c}
 Average cycles  : {ave_c}
+RMS cycles      : {rms_c}
 Max cycles      : {max_c}
 """
         out += "\n\033[4mRaw data:\033[0m\n{raw}" if raw_data else ""
@@ -24,6 +28,7 @@ Max cycles      : {max_c}
         with open(test_file, "r") as f:
             whole_file = f.read().splitlines()
             num_tests = len(whole_file)
+            total_time = -time.time_ns()
             for num, d in enumerate(whole_file):
                 print("\r[{:<50}] {:>5}/{:<5} ({:>3}%)".format("*" * floor(50 * (num + 1) / num_tests), num + 1,
                                                                num_tests, floor(100 * (num + 1) / num_tests)), end="")
@@ -31,9 +36,12 @@ Max cycles      : {max_c}
                 inputs = [int(i) for i in inputs.split(",")]
                 outputs = [int(i) for i in outputs.split(",")]
                 res.append(self.single_test(inputs, outputs, name, int(max_cycles)))
+            total_time += time.time_ns()
         print(out.format(passed=(passed := sum([i for _, _, i in res])), failed=len(res) - passed,
+                         mail=len(self.full), tpt=total_time / num_tests,
                          min_c=min([i for _, i, _ in res]), max_c=max([i for _, i, _ in res]),
                          ave_c=sum([i for _, i, _ in res]) / len(res),
+                         rms_c=sum([i * i for _, i, _ in res]) / len(res) ** 0.5,
                          raw="\n".join(
                              [f"{test_name:<20} c={cycles:<4} p={pass_}" for test_name, cycles, pass_ in res])))
 
@@ -42,12 +50,12 @@ Max cycles      : {max_c}
             print(f"\nTest {test_name}\n{message}")
             return [test_name, cycles, False]
 
-        break_conditions = {"BR": lambda: True, "BRP": lambda: not neg, "BRZ": lambda: acc == 0}
+        break_conditions = {"BR": lambda: True, "BRP": lambda: acc_actual > 0, "BRZ": lambda: acc == 0}
         given.reverse()
         line = 0
         cycles = 0
         acc = 0
-        neg = False
+        acc_actual = 0
         out = []
         while cycles < max_cycles:
             cmd, ptr = self.full[line]
@@ -74,16 +82,12 @@ Max cycles      : {max_c}
             elif cmd in ["ADD", "SUB"]:
                 if ptr not in self.data.keys():
                     return error(f"{ptr} is an unknown register")
-                acc += (1 if cmd == "ADD" else -1) * self.data[ptr]
-                if acc < 0:
-                    neg = True
-                else:
-                    neg = False
-                acc %= 1000
+                acc_actual += (1 if cmd == "ADD" else -1) * self.data[ptr]
+                acc = acc_actual % 1000
             elif cmd == "OUT":
                 out.append(acc)
             elif cmd == "HLT":
-                return [test_name, cycles, out == expected]
+                return [test_name, cycles + 1, out == expected]
             elif cmd == "DAT":
                 return error("Why are you trying to run data? Stop it. Get some help")
             else:

@@ -10,6 +10,15 @@ python main.py -r path/to/assembly/file.txt path/to/tests.txt raw_bool
 ```
 If the `raw_bool` is either `true` or `yes`, all the raw data from the tests will be returned to you. Useful if you have lots of tests and just want averages
 
+The returns the following:
+
+- Number of passed and failed tests
+- Number of mailboxes used
+- Average time per test in nanoseconds
+- Minimum and maximum number of cycles
+- Mean average number of cycles
+- Root mean squared (RMS) number of cycles
+
 ### Translator
 ```shell
 python main.py -t path/to/lmc/file.txt
