@@ -5,7 +5,7 @@ from translator import LMC2ASM
 if len(argv) == 2:
     exit(0)
 
-if argv[1] == "-r":
+if argv[1] == "-b":
     prog_path = argv[2]
     test_path = argv[3]
     try:
@@ -14,6 +14,8 @@ if argv[1] == "-r":
         return_raw = False
     prog = Program(open(prog_path).read())
     prog.test(test_path, return_raw)
-
-if argv[1] == "-t":
+elif argv[1] == "-r":
+    prog_path = argv[2]
+    Program(open(prog_path).read()).run([], True)
+elif argv[1] == "-t":
     LMC2ASM(open(argv[2]).read())
