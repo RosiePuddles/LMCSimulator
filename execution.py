@@ -117,14 +117,17 @@ def format_prog(raw_text: str):
     full = []
     ln = 0
     for i in raw_text.splitlines():
-        if i[0] == "#":
+        if i.strip() == "" or i[0] == "#":
             continue
         else:
-            temp = i.split("\t")
+            temp = [n.strip() for n in i.split("\t")]
             if temp[-1].strip()[0] == "#":
                 del temp[-1]
             if temp[1] == "DAT":
-                data[temp[0]] = int(temp[2] if temp[2] else 0)
+                try:
+                    data[temp[0]] = int(temp[2]) if temp[2] else 0
+                except IndexError:
+                    data[temp[0]] = 0
             elif temp[0] != "":
                 pointers[temp[0]] = ln
             if len(temp) == 2:
