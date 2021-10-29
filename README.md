@@ -6,7 +6,7 @@
 ## Usage
 ### Batch tests
 ```shell
-python main.py -r path/to/assembly/file.txt path/to/tests.txt raw_bool
+python main.py -b path/to/assembly/file.txt path/to/tests.txt raw_bool
 ```
 If the `raw_bool` is either `true` or `yes`, all the raw data from the tests will be returned to you. Useful if you have lots of tests and just want averages
 
@@ -18,6 +18,13 @@ The returns the following:
 - Minimum and maximum number of cycles
 - Mean average number of cycles
 - Root mean squared (RMS) number of cycles
+
+### Run a file
+```shell
+python main.py -r path/to/assembly/file.txt
+```
+
+Runs an assembly file. what else do you want?
 
 ### Translator
 ```shell
