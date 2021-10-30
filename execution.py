@@ -111,6 +111,7 @@ Cycles spread   : {sd:.5f}
         res = self.run(given, False, max_cycles)
         return [test_name, res[1], res[0] == expected]
 
+
 def format_prog(raw_text: str):
     pointers = {}
     data = {}
@@ -121,7 +122,7 @@ def format_prog(raw_text: str):
             continue
         else:
             temp = [n.strip() for n in i.split("\t")]
-            if temp[-1].strip()[0] == "#":
+            while temp[-1].strip() == "" or temp[-1].strip()[0] == "#":
                 del temp[-1]
             if temp[1] == "DAT":
                 try:
